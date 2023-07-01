@@ -5,7 +5,7 @@ This is a simple project to learn (or attempt to) about MIDI 2.0. Goal was to le
 
 There are NO current MIDI 2.0 tools to validate against that is open the public currently so I have been watching the [Microsoft MIDI](https://github.com/microsoft/MIDI) releases closely. When they are far enough with development, I'll start to test!
 
-This project supports two diferent builds (sorry, not dynamically switchable), MIDI 1.0 and MIDI 2.0.
+This project supports two different builds (sorry, not dynamically switchable), MIDI 1.0 and MIDI 2.0.
 ## Tools
 (only built on Windows thus far)
 1. [STM32CubeIDE](https://www.st.com/en/development-tools/stm32cubeide.html)
