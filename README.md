@@ -46,10 +46,16 @@ This project supports two different builds (sorry, not dynamically switchable), 
    3. Under "Debugger", select your hardware programmer and setup as needed
    4. Select "Debug" to start debugging
 ## Misc
-1. As far as I know, all MIDI 1.0 functionality is the same as the original product, if anything was missed it is easy to add (it's just code!)
+1. As far as I know, all MIDI 1.0 functionality is the same as the original product, if anything was missed it is easy to add (it's just code!).  MIDI 2.0 functionality has NOT been tested other than through some development board code I wrote.
 2. Each key on the keyboard was designed with a 2 stage micro-switch. Just barely pressing the key registers the first actuation, continuing the press motion activates the second stage. Noting the delta time between the actuations represents the key velocity (loudness). The circuit is multiplexed so we need to scan at a high rate.
 3. [FreeRTOS](https://www.freertos.org/) was used because it makes sense.
 4. DO NOT run the application builder as I modified drivers and startup code, they will be overwritten.
+5. Commenting is seriously lacking but will be added as I have time.
+## Code
+1. The meat of the code is in Core/Source.
+2. main_app.c owns the main task, it processes keypad presses, ADC changes and proceses MIDI traffic.
+3. keyboard.c owns the keyboard task, it scans and processes key presses.
+4. usbd_midi_X0_app.c builds and processes MIDI USB messages depending on the version. 
 
 ## Peripheral Map
 To the best of my knowledge, here is the map of microcontroller pins
