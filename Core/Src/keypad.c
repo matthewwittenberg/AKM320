@@ -93,7 +93,7 @@ void keypad_task(void const *param)
 			}
 		}
 
-		osDelay(1);
+		osDelay(10);
 	}
 }
 

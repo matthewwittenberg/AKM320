@@ -22,6 +22,13 @@ osThreadId _main_app_thread_handle = NULL;
 static KEY_T _main_app_key = KEY_NONE;
 static bool _main_app_key_change = false;
 
+/**
+ * @brief Keypad key handler
+ *
+ * @param key
+ * @param state
+ * @param param
+ */
 void key_callback_handler(KEY_T key, KEY_STATE_T state, void *param)
 {
     if(state == KEY_PRESS)
@@ -31,6 +38,10 @@ void key_callback_handler(KEY_T key, KEY_STATE_T state, void *param)
     }
 }
 
+/**
+ * @brief Pull up the USB data+ line indicating to the host we are connected
+ *
+ */
 static void signal_usb_ready(void)
 {
     GPIO_InitTypeDef GPIO_InitStruct = {0};
@@ -44,6 +55,11 @@ static void signal_usb_ready(void)
     HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
 }
 
+/**
+ * @brief Spin the LED's
+ *
+ * @param cycles Cycles to spin
+ */
 void led_spin(uint8_t cycles)
 {
     uint8_t led[] = { LED_1, LED_2, LED_4, LED_3 };
@@ -59,6 +75,11 @@ void led_spin(uint8_t cycles)
     }
 }
 
+/**
+ * @brief Main app task
+ *
+ * @param argument
+ */
 void main_app_task(void const * argument)
 {
     uint32_t adc_tick = ADC_POLL_RATE;
@@ -92,8 +113,10 @@ void main_app_task(void const * argument)
     {
         osDelay(10);
 
+        // process key presses
         if(_main_app_key_change)
         {
+            // octave+ pressed, shift the notes an octave higher
             if(_main_app_key == KEY_OCTAVE_PLUS)
             {
                 uint8_t note = keyboard_get_start_note();
@@ -107,6 +130,7 @@ void main_app_task(void const * argument)
                 led_set(LED_2, octave_offset < 0);
             }
 
+            // octave- pressed, shift the notes an octave lower
             if(_main_app_key == KEY_OCTAVE_MINUS)
             {
                 int8_t note = (int8_t)keyboard_get_start_note();
@@ -120,6 +144,7 @@ void main_app_task(void const * argument)
                 led_set(LED_2, octave_offset < 0);
             }
 
+            // transpose+ pressed, shift the notes a step higher
             if(_main_app_key == KEY_TRANSPOSE_PLUS)
             {
                 uint8_t note = keyboard_get_start_note();
@@ -133,6 +158,7 @@ void main_app_task(void const * argument)
                 led_set(LED_4, transpose_offset < 0);
             }
 
+            // transpose- pressed, shift the notes a step lower
             if(_main_app_key == KEY_TRANSPOSE_MINUS)
             {
                 int8_t note = (int8_t)keyboard_get_start_note();
@@ -194,17 +220,23 @@ void main_app_task(void const * argument)
             adc_tick = osKernelSysTick();
         }
 
+        // push out a sense message every so often
         if(sense_tick + MIDI_SENSE_RATE < osKernelSysTick())
         {
-            //MIDI_DEVICE.sense();
+            MIDI_DEVICE.sense();
 
             sense_tick = osKernelSysTick();
         }
 
+        // process USB MIDI
         MIDI_DEVICE.task();
     }
 }
 
+/**
+ * @brief Initialize main app
+ *
+ */
 void main_app_init()
 {
     keypad_register_callback(key_callback_handler, NULL);
@@ -212,5 +244,3 @@ void main_app_init()
     osThreadDef(defaultTask, main_app_task, osPriorityNormal, 0, 256);
     _main_app_thread_handle = osThreadCreate(osThread(defaultTask), NULL);
 }
-
-
