@@ -3,7 +3,7 @@ MIDIPLUS AKM320 - MIDI 2.0 Research Project
 ## About
 This is a simple project to learn (or attempt to) about MIDI 2.0. Goal was to learn on an actual product and not on some development board that is useless to me at the end. I chose the AKM320 as it is cheap and well designed. This code was pounded out fairly quickly on nights/weekends, I wouldn't consider it ready for prime-time.
 
-There are NO current MIDI 2.0 tools to validate against that is open the public currently so I have been watching the [Microsoft MIDI](https://github.com/microsoft/MIDI) releases closely. When they are far enough with development, I'll start to test!
+There are NO current MIDI 2.0 tools to validate against that is open the public so I have been watching the [Microsoft MIDI](https://github.com/microsoft/MIDI) releases closely. When they are far enough with development, I'll start to test!
 
 This project supports two different builds (sorry, not dynamically switchable), MIDI 1.0 and MIDI 2.0.
 ## Tools
