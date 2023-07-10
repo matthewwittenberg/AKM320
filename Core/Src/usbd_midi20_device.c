@@ -175,10 +175,12 @@ static uint8_t USBD_MIDI20_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
     /* Open EP IN */
     USBD_LL_OpenEP(pdev, USBD_MIDI20_EP_IN_ADDR, USBD_EP_TYPE_BULK, USBD_MIDI20_EP_MAX_PACKET_SIZE);
     pdev->ep_in[USBD_MIDI20_EP_IN_ADDR & 0xFU].is_used = 1U;
+    pdev->ep_in[USBD_MIDI20_EP_IN_ADDR & 0xFU].maxpacket = USBD_MIDI20_EP_MAX_PACKET_SIZE;
 
     /* Open EP OUT */
     USBD_LL_OpenEP(pdev, USBD_MIDI20_EP_OUT_ADDR, USBD_EP_TYPE_BULK, USBD_MIDI20_EP_MAX_PACKET_SIZE);
     pdev->ep_out[USBD_MIDI20_EP_OUT_ADDR & 0xFU].is_used = 1U;
+    pdev->ep_out[USBD_MIDI20_EP_OUT_ADDR & 0xFU].maxpacket = USBD_MIDI20_EP_MAX_PACKET_SIZE;
 
     pdev->pClassData = USBD_malloc(sizeof(USBD_MIDI20_ClassData));
 
@@ -191,6 +193,7 @@ static uint8_t USBD_MIDI20_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx)
         pclass_data = (USBD_MIDI20_ClassData*)pdev->pClassData;
 
         /* Prepare Out endpoint to receive 1st packet */
+        memset(pclass_data->rx_buf, 0, sizeof(USBD_MIDI20_ClassData));
         USBD_LL_PrepareReceive(pdev, USBD_MIDI20_EP_OUT_ADDR, pclass_data->rx_buf, MIDI20_RX_LENGTH);
     }
 
@@ -342,12 +345,11 @@ static uint8_t  USBD_MIDI20_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
 {
     USBD_MIDI20_Callbacks *pcallbacks = (USBD_MIDI20_Callbacks*)pdev->pUserData;
     uint8_t *pdata = ((USBD_MIDI20_ClassData*)pdev->pClassData)->rx_buf;
-    uint32_t length = pdev->ep_out[USBD_MIDI20_EP_OUT_ADDR & 0xFU].total_length;
     uint32_t index = 0;
     uint8_t message_type;
     uint8_t message_length;
 
-    while(index < length)
+    while(1)
     {
         message_type = pdata[index] & 0xF0;
         switch(message_type)
@@ -359,10 +361,10 @@ static uint8_t  USBD_MIDI20_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
                 break;
             case MIDI20_MESSAGE_TYPE_DATA64:
             case MIDI20_MESSAGE_TYPE_20_CHANNEL_VOICE:
-                message_length = 6;
+                message_length = 8;
                 break;
             case MIDI20_MESSAGE_TYPE_DATA128:
-                message_length = 8;
+                message_length = 16;
                 break;
             default:
                 message_length = 0;
@@ -372,10 +374,11 @@ static uint8_t  USBD_MIDI20_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
         if(message_length == 0)
             break;
 
-        pcallbacks->message_rx(pdata, message_length);
+        pcallbacks->message_rx(&pdata[index], message_length);
         index += message_length;
     }
 
+    memset(((USBD_MIDI20_ClassData*)pdev->pClassData)->rx_buf, 0, sizeof(USBD_MIDI20_ClassData));
     USBD_LL_PrepareReceive(pdev, USBD_MIDI20_EP_OUT_ADDR, ((USBD_MIDI20_ClassData*)pdev->pClassData)->rx_buf, MIDI20_RX_LENGTH);
 
     return USBD_OK;

@@ -7,6 +7,8 @@
 #define MAN_ID_MD 0x21
 #define MAN_ID_LO 0x4E
 
+#define CI_MAX_SYSEX_SIZE 0x100
+
 #pragma pack(push, 1)
 typedef struct
 {
@@ -28,7 +30,7 @@ typedef struct
     uint8_t family_model[2];
     uint8_t software_revision[4];
     uint8_t capability_category;
-    uint32_t max_sysex_size;
+    uint8_t max_sysex_size[4];
     uint8_t sysex_end;
 } MIDI_CI_DISCOVERY_REQUEST_VERSION_1_T;
 
@@ -40,7 +42,7 @@ typedef struct
     uint8_t family_model[2];
     uint8_t software_revision[4];
     uint8_t capability_category;
-    uint32_t max_sysex_size;
+    uint8_t max_sysex_size[4];
     uint8_t output_path_id;
     uint8_t sysex_end;
 } MIDI_CI_DISCOVERY_REQUEST_VERSION_2_T;
@@ -53,7 +55,7 @@ typedef struct
     uint8_t family_model[2];
     uint8_t software_revision[4];
     uint8_t capability_category;
-    uint32_t max_sysex_size;
+    uint8_t max_sysex_size[4];
     uint8_t sysex_end;
 } MIDI_CI_DISCOVERY_REPLY_VERSION_1_T;
 
@@ -65,7 +67,7 @@ typedef struct
     uint8_t family_model[2];
     uint8_t software_revision[4];
     uint8_t capability_category;
-    uint32_t max_sysex_size;
+    uint8_t max_sysex_size[4];
     uint8_t output_path_id;
     uint8_t function_block;
     uint8_t sysex_end;
@@ -189,7 +191,10 @@ void midi20_ci_process_discovery1(uint8_t *pmessage, uint32_t length)
     reply.software_revision[2] = 0;
     reply.software_revision[3] = 0;
     reply.capability_category = MIDI20_CI_CATEGORY_PROPERTY_EXCHANGE;
-    reply.max_sysex_size = 0x00000100;
+    reply.max_sysex_size[0] = (CI_MAX_SYSEX_SIZE >> 0) & 0x7F;
+    reply.max_sysex_size[1] = (CI_MAX_SYSEX_SIZE >> 7) & 0x7F;
+    reply.max_sysex_size[2] = (CI_MAX_SYSEX_SIZE >> 14) & 0x7F;
+    reply.max_sysex_size[3] = (CI_MAX_SYSEX_SIZE >> 21) & 0x7F;
     reply.sysex_end = MIDI_SYSEX_END;
 
     if(_process_callback)
@@ -215,7 +220,10 @@ void midi20_ci_process_discovery2(uint8_t *pmessage, uint32_t length)
     reply.software_revision[2] = 0;
     reply.software_revision[3] = 0;
     reply.capability_category = MIDI20_CI_CATEGORY_PROPERTY_EXCHANGE;
-    reply.max_sysex_size = 0x00000100;
+    reply.max_sysex_size[0] = (CI_MAX_SYSEX_SIZE >> 0) & 0x7F;
+    reply.max_sysex_size[1] = (CI_MAX_SYSEX_SIZE >> 7) & 0x7F;
+    reply.max_sysex_size[2] = (CI_MAX_SYSEX_SIZE >> 14) & 0x7F;
+    reply.max_sysex_size[3] = (CI_MAX_SYSEX_SIZE >> 21) & 0x7F;
     reply.output_path_id = prequest->output_path_id;
     reply.function_block = 0;
     reply.sysex_end = MIDI_SYSEX_END;

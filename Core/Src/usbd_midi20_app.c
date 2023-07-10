@@ -258,7 +258,7 @@ void usbd_midi20_ci_process_handler(uint8_t *pmessage, uint32_t length)
         {
             message[2+j] = pmessage[index++];
         }
-        message[1] |= ((j + 1) & 0x0F);
+        message[1] |= (j & 0x0F);
 
         usbd_midi20_send_message(message, sizeof(message));
     }
@@ -267,7 +267,7 @@ void usbd_midi20_ci_process_handler(uint8_t *pmessage, uint32_t length)
 void usbd_midi20_process_sysex()
 {
     // pass to ci manager
-    midi20_ci_process(_midi20_rx_message_queue, _midi20_sysex_buffer_index, usbd_midi20_ci_process_handler);
+    midi20_ci_process(_midi20_sysex_buffer, _midi20_sysex_buffer_index, usbd_midi20_ci_process_handler);
 }
 
 void usbd_midi20_task()
@@ -294,14 +294,17 @@ void usbd_midi20_task()
         }
 
         if(message_length == 0)
+        {
+            _midi20_rx_message_tail = _midi20_rx_message_head;
             break;
+        }
 
         uint8_t message[MIDI20_MESSAGE_LENGTH];
         for(int32_t i=0; i<message_length; i++)
         {
             message[i] = _midi20_rx_message_queue[_midi20_rx_message_tail];
             _midi20_rx_message_tail++;
-            if(_midi20_rx_message_tail >= TX_MESSAGE_QUEUE_DEPTH)
+            if(_midi20_rx_message_tail >= RX_MESSAGE_QUEUE_DEPTH)
                 _midi20_rx_message_tail = 0;
         }
 
@@ -314,19 +317,18 @@ void usbd_midi20_task()
             if(byte_count > 6)
                 byte_count = 6;
 
-            for(uint32_t i=0; i<byte_count; i++)
-                _midi20_sysex_buffer[_midi20_sysex_buffer_index++] = message[i+2];
-
-            if(_midi20_sysex_buffer_index >= SYSEX_BUFFER_LENGTH)
+            for(uint8_t i=0; i<byte_count; i++)
             {
-                _midi20_sysex_buffer_index = 0;
+                _midi20_sysex_buffer[_midi20_sysex_buffer_index] = message[i+2];
+                _midi20_sysex_buffer_index++;
+                if(_midi20_sysex_buffer_index >= SYSEX_BUFFER_LENGTH)
+                    _midi20_sysex_buffer_index = 0;
             }
-            else
+
+            if((status == MIDI20_SYSEX_STATUS_COMPLETE_IN_1) || (status == MIDI20_SYSEX_STATUS_STOP))
             {
-                if((status == MIDI20_SYSEX_STATUS_COMPLETE_IN_1) || (status == MIDI20_SYSEX_STATUS_STOP))
-                {
-                    usbd_midi20_process_sysex();
-                }
+                usbd_midi20_process_sysex();
+                _midi20_sysex_buffer_index = 0;
             }
         }
     }
