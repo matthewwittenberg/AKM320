@@ -349,36 +349,29 @@ static uint8_t  USBD_MIDI20_DataOut(USBD_HandleTypeDef *pdev, uint8_t epnum)
     uint8_t message_type;
     uint8_t message_length;
 
-    while(1)
+    message_type = pdata[index] & 0xF0;
+    switch(message_type)
     {
-        message_type = pdata[index] & 0xF0;
-        switch(message_type)
-        {
-            case MIDI20_MESSAGE_TYPE_UTILITY:
-            case MIDI20_MESSAGE_TYPE_SYSTEM:
-            case MIDI20_MESSAGE_TYPE_10_CHANNEL_VOICE:
-                message_length = 4;
-                break;
-            case MIDI20_MESSAGE_TYPE_DATA64:
-            case MIDI20_MESSAGE_TYPE_20_CHANNEL_VOICE:
-                message_length = 8;
-                break;
-            case MIDI20_MESSAGE_TYPE_DATA128:
-                message_length = 16;
-                break;
-            default:
-                message_length = 0;
-                break;
-        }
-
-        if(message_length == 0)
+        case MIDI20_MESSAGE_TYPE_UTILITY:
+        case MIDI20_MESSAGE_TYPE_SYSTEM:
+        case MIDI20_MESSAGE_TYPE_10_CHANNEL_VOICE:
+            message_length = 4;
             break;
-
-        pcallbacks->message_rx(&pdata[index], message_length);
-        index += message_length;
+        case MIDI20_MESSAGE_TYPE_DATA64:
+        case MIDI20_MESSAGE_TYPE_20_CHANNEL_VOICE:
+            message_length = 8;
+            break;
+        case MIDI20_MESSAGE_TYPE_DATA128:
+            message_length = 16;
+            break;
+        default:
+            message_length = 0;
+            break;
     }
 
-    memset(((USBD_MIDI20_ClassData*)pdev->pClassData)->rx_buf, 0, sizeof(USBD_MIDI20_ClassData));
+    if(message_length > 0)
+        pcallbacks->message_rx(pdata, message_length);
+
     USBD_LL_PrepareReceive(pdev, USBD_MIDI20_EP_OUT_ADDR, ((USBD_MIDI20_ClassData*)pdev->pClassData)->rx_buf, MIDI20_RX_LENGTH);
 
     return USBD_OK;

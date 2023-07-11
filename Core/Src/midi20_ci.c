@@ -7,7 +7,7 @@
 #define MAN_ID_MD 0x21
 #define MAN_ID_LO 0x4E
 
-#define CI_MAX_SYSEX_SIZE 0x100
+#define CI_MAX_SYSEX_SIZE 128
 
 #pragma pack(push, 1)
 typedef struct
@@ -18,8 +18,8 @@ typedef struct
     uint8_t sub_id1;
     uint8_t sub_id2;
     uint8_t ci_version;
-    uint32_t source_muid;
-    uint32_t destination_muid;
+    uint8_t source_muid[4];
+    uint8_t destination_muid[4];
 } MIDI_CI_HEADER_T;
 
 typedef struct
@@ -84,7 +84,7 @@ typedef struct
 {
     MIDI_CI_HEADER_T header;
     uint8_t status;
-    uint16_t length;
+    uint8_t length[2];
     char product_id[16];
     uint8_t sysex_end;
 } MIDI_CI_INQUIRY_ENDPOINT_REPLY_T;
@@ -102,7 +102,7 @@ typedef struct
     uint8_t nak_code;
     uint8_t nak_data;
     uint8_t nak_details[5];
-    uint16_t length;
+    uint8_t length[2];
     char message[32];
     uint8_t sysex_end;
 } MIDI_CI_NAK_REPLY_VERSION_2_T;
@@ -114,7 +114,7 @@ typedef struct
     uint8_t ack_code;
     uint8_t ack_data;
     uint8_t ack_details[5];
-    uint16_t length;
+    uint8_t length[2];
     char message[32];
     uint8_t sysex_end;
 } MIDI_CI_ACK_REPLY_VERSION_2_T;
@@ -154,6 +154,43 @@ typedef struct
 
 uint32_t _midi_ci_muid;
 ci_process_callback _process_callback = NULL;
+char _ci_property_buffer[256];
+
+uint32_t bytes_to_uint32(uint8_t *pbytes)
+{
+    uint32_t value = 0;
+
+    value |= (pbytes[0] << 0) & 0x0000007F;
+    value |= (pbytes[1] << 7) & 0x00003F80;
+    value |= (pbytes[2] << 14) & 0x001FC000;
+    value |= (pbytes[3] << 21) & 0x0FE00000;
+
+    return value;
+}
+
+void uint32_to_bytes(uint32_t value, uint8_t *pbytes)
+{
+    pbytes[0] = (value >> 0) & 0x7F;
+    pbytes[1] = (value >> 7) & 0x7F;
+    pbytes[2] = (value >> 14) & 0x7F;
+    pbytes[3] = (value >> 21) & 0x7F;
+}
+
+uint16_t bytes_to_uint16(uint8_t *pbytes)
+{
+    uint16_t value = 0;
+
+    value |= (pbytes[0] << 0) & 0x0000007F;
+    value |= (pbytes[1] << 7) & 0x00003F80;
+
+    return value;
+}
+
+void uint16_to_bytes(uint16_t value, uint8_t *pbytes)
+{
+    pbytes[0] = (value >> 0) & 0x7F;
+    pbytes[1] = (value >> 7) & 0x7F;
+}
 
 void midi20_ci_init()
 {
@@ -168,8 +205,8 @@ void midi20_ci_build_header(MIDI_CI_HEADER_T *prequest_header, MIDI_CI_HEADER_T 
     preply_header->sub_id1 = MIDI20_UNIVERSAL_SYSEX_SUBID1_CI;
     preply_header->sub_id2 = sub_id2;
     preply_header->ci_version = prequest_header->ci_version;
-    preply_header->source_muid = _midi_ci_muid;
-    preply_header->destination_muid = prequest_header->source_muid;
+    uint32_to_bytes(_midi_ci_muid, preply_header->source_muid);
+    memcpy(preply_header->destination_muid, prequest_header->source_muid, 4);
 }
 
 void midi20_ci_process_discovery1(uint8_t *pmessage, uint32_t length)
@@ -182,19 +219,11 @@ void midi20_ci_process_discovery1(uint8_t *pmessage, uint32_t length)
     reply.manufacturer[0] = MAN_ID_LO;
     reply.manufacturer[1] = MAN_ID_MD;
     reply.manufacturer[2] = MAN_ID_HI;
-    reply.family[0] = 0;
-    reply.family[1] = 0;
-    reply.family_model[0] = 0;
-    reply.family_model[1] = 0;
-    reply.software_revision[0] = 0;
-    reply.software_revision[1] = 0;
-    reply.software_revision[2] = 0;
-    reply.software_revision[3] = 0;
+    uint16_to_bytes(0, reply.family);
+    uint16_to_bytes(0, reply.family_model);
+    uint32_to_bytes(0, reply.software_revision);
     reply.capability_category = MIDI20_CI_CATEGORY_PROPERTY_EXCHANGE;
-    reply.max_sysex_size[0] = (CI_MAX_SYSEX_SIZE >> 0) & 0x7F;
-    reply.max_sysex_size[1] = (CI_MAX_SYSEX_SIZE >> 7) & 0x7F;
-    reply.max_sysex_size[2] = (CI_MAX_SYSEX_SIZE >> 14) & 0x7F;
-    reply.max_sysex_size[3] = (CI_MAX_SYSEX_SIZE >> 21) & 0x7F;
+    uint32_to_bytes(CI_MAX_SYSEX_SIZE, reply.max_sysex_size);
     reply.sysex_end = MIDI_SYSEX_END;
 
     if(_process_callback)
@@ -211,19 +240,11 @@ void midi20_ci_process_discovery2(uint8_t *pmessage, uint32_t length)
     reply.manufacturer[0] = MAN_ID_LO;
     reply.manufacturer[1] = MAN_ID_MD;
     reply.manufacturer[2] = MAN_ID_HI;
-    reply.family[0] = 0;
-    reply.family[1] = 0;
-    reply.family_model[0] = 0;
-    reply.family_model[1] = 0;
-    reply.software_revision[0] = 0;
-    reply.software_revision[1] = 0;
-    reply.software_revision[2] = 0;
-    reply.software_revision[3] = 0;
+    uint16_to_bytes(0, reply.family);
+    uint16_to_bytes(0, reply.family_model);
+    uint32_to_bytes(0, reply.software_revision);
     reply.capability_category = MIDI20_CI_CATEGORY_PROPERTY_EXCHANGE;
-    reply.max_sysex_size[0] = (CI_MAX_SYSEX_SIZE >> 0) & 0x7F;
-    reply.max_sysex_size[1] = (CI_MAX_SYSEX_SIZE >> 7) & 0x7F;
-    reply.max_sysex_size[2] = (CI_MAX_SYSEX_SIZE >> 14) & 0x7F;
-    reply.max_sysex_size[3] = (CI_MAX_SYSEX_SIZE >> 21) & 0x7F;
+    uint32_to_bytes(CI_MAX_SYSEX_SIZE, reply.max_sysex_size);
     reply.output_path_id = prequest->output_path_id;
     reply.function_block = 0;
     reply.sysex_end = MIDI_SYSEX_END;
@@ -240,7 +261,7 @@ void midi20_ci_process_inquiry_endpoint(uint8_t *pmessage, uint32_t length)
     memset(&reply, 0, sizeof(reply));
     midi20_ci_build_header(&prequest->header, &reply.header, MIDI20_UNIVERSAL_SYSEX_SUBID2_INQUIRY_ENDPOINT_REPLY);
     reply.status = 0;
-    reply.length = 16;
+    uint16_to_bytes(16, reply.length);
     strcpy(reply.product_id, "AKM320_CUSTOM");
     reply.sysex_end = MIDI_SYSEX_END;
 
@@ -269,7 +290,7 @@ void midi20_ci_nak2(uint8_t *pmessage, uint32_t length, uint8_t status_code, con
     midi20_ci_build_header(pheader, &reply.header, MIDI20_UNIVERSAL_SYSEX_SUBID2_NAK);
     reply.original_sub_id2 = pheader->sub_id2;
     reply.nak_code = status_code;
-    reply.length = 32;
+    uint16_to_bytes(32, reply.length);
     strcpy(reply.message, ptext);
 
     if(_process_callback)
@@ -285,7 +306,7 @@ void midi20_ci_ack(uint8_t *pmessage, uint32_t length, uint8_t status_code, cons
     midi20_ci_build_header(pheader, &reply.header, MIDI20_UNIVERSAL_SYSEX_SUBID2_ACK);
     reply.original_sub_id2 = pheader->sub_id2;
     reply.ack_code = status_code;
-    reply.length = 32;
+    uint16_to_bytes(32, reply.length);
     strcpy(reply.message, ptext);
 
     if(_process_callback)
@@ -336,20 +357,36 @@ void midi20_ci_reply_prop_get(MIDI_CI_HEADER_T *prequest_header, uint8_t request
         midi20_ci_build_header(prequest_header, (MIDI_CI_HEADER_T*)preply, MIDI20_UNIVERSAL_SYSEX_SUBID2_INQUIRY_PROP_EX_GET_REPLY);
         uint32_t index = sizeof(MIDI_CI_HEADER_T);
 
-        preply[index++] = request_id;                       // request_id
-        preply[index++] = header_length;                    // header length
-        preply[index++] = 0;
-        memcpy(preply, pheader_data, header_length);        // header data
+        // request id
+        preply[index] = request_id;
+        index++;
+
+        // header length
+        uint16_to_bytes(header_length, &preply[index]);
+        index += 2;
+
+        // header data
+        memcpy(&preply[index], pheader_data, header_length);
         index += header_length;
-        preply[index++] = total_chunks;                     // chunks in message
-        preply[index++] = total_chunks >> 8;
-        preply[index++] = chunk;                            // chunk
-        preply[index++] = chunk >> 8;
-        preply[index++] = property_length & 0x7F;           // property length
-        preply[index++] = (property_length >> 7) & 0x7F;
-        memcpy(preply, pproperty_data, property_length);    // property data
+
+        // chunks in message
+        uint16_to_bytes(total_chunks, &preply[index]);
+        index += 2;
+
+        // chunk
+        uint16_to_bytes(chunk, &preply[index]);
+        index += 2;
+
+        // property length
+        uint16_to_bytes(property_length, &preply[index]);
+        index += 2;
+
+        // property data
+        memcpy(&preply[index], pproperty_data, property_length);
         index += property_length;
-        preply[index++] = MIDI_SYSEX_END;                   // sysex end
+
+        // sysex end
+        preply[index++] = MIDI_SYSEX_END;
 
         if(_process_callback)
             _process_callback(preply, index);
@@ -373,18 +410,28 @@ void midi20_ci_process_inquiry_prop_ex_get(uint8_t *pmessage, uint32_t length)
     uint8_t request_id;
     uint16_t header_data_length;
     char *pheader_data;
-//    uint16_t chunks_in_message;
-//    uint16_t chunk_number;
+    uint16_t chunks_in_message;
+    uint16_t chunk_number;
 
+    // request id
     request_id = pmessage[index];
     index += 1;
-    header_data_length = pmessage[index] | (pmessage[index+1] << 8);
+
+    // header data length
+    header_data_length = bytes_to_uint16(&pmessage[index]);
     index += 2;
+
+    // header data
     pheader_data = (char*)&pmessage[index];
-//    index += header_data_length;
-//    chunks_in_message = pmessage[index] | (pmessage[index+1] << 8);
-//    index += 2;
-//    chunk_number = pmessage[index] | (pmessage[index] << 8);
+    index += header_data_length;
+
+    // chunks in message
+    chunks_in_message = bytes_to_uint16(&pmessage[index]);
+    index += 2;
+
+    // chunk
+    chunk_number = bytes_to_uint16(&pmessage[index]);
+    index += 2;
 
     if(header_data_length == 0)
     {
@@ -400,7 +447,6 @@ void midi20_ci_process_inquiry_prop_ex_get(uint8_t *pmessage, uint32_t length)
 
     if(strnstr(pheader_data, "resource", header_data_length) != NULL)
     {
-        char prop_buffer[256];
         uint16_t prop_length = 0;
         uint16_t total_chunks = 1;
         uint16_t chunk = 0;
@@ -408,11 +454,12 @@ void midi20_ci_process_inquiry_prop_ex_get(uint8_t *pmessage, uint32_t length)
 
         while(chunk < total_chunks)
         {
-            result = midi20_ci_get_prop_manufacturer(pheader_data, header_data_length, prop_buffer, &prop_length, chunk, &total_chunks);
+            memset(_ci_property_buffer, 0, sizeof(_ci_property_buffer));
+            result = midi20_ci_get_prop_manufacturer(pheader_data, header_data_length, _ci_property_buffer, &prop_length, chunk, &total_chunks);
 
             if(result == MIDI20_CI_RESULT_SUCCESS)
             {
-                midi20_ci_reply_prop_get(pheader, request_id, "{\"status\":200}", prop_buffer, chunk, total_chunks);
+                midi20_ci_reply_prop_get(pheader, request_id, "{\"status\":200}", _ci_property_buffer, chunk, total_chunks);
                 chunk++;
             }
             else
