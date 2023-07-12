@@ -459,7 +459,7 @@ void midi20_ci_process_inquiry_prop_ex_get(uint8_t *pmessage, uint32_t length)
 
             if(result == MIDI20_CI_RESULT_SUCCESS)
             {
-                midi20_ci_reply_prop_get(pheader, request_id, "{\"status\":200}", _ci_property_buffer, chunk, total_chunks);
+                midi20_ci_reply_prop_get(pheader, request_id, "{\"status\":200}", _ci_property_buffer, chunk+1, total_chunks);
                 chunk++;
             }
             else
