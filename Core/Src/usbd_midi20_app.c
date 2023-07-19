@@ -222,6 +222,22 @@ void usbd_midi20_sense()
     usbd_midi20_send_message(message, sizeof(message));
 }
 
+void usbd_midi20_sustain(uint8_t channel, bool on)
+{
+    uint32_t hold_value = on ? 0x7F : 0;
+
+    uint8_t message[8];
+    message[0] = MIDI20_MESSAGE_TYPE_20_CHANNEL_VOICE;
+    message[1] = MIDI_CONTROLLER | channel;
+    message[2] = MIDI_CONT_HOLD_PEDAL;
+    message[3] = 0;
+    message[4] = hold_value;
+    message[5] = hold_value >> 8;
+    message[6] = 0;
+    message[7] = 0;
+    usbd_midi20_send_message(message, sizeof(message));
+}
+
 void usbd_midi20_ci_process_handler(uint8_t *pmessage, uint32_t length)
 {
     uint32_t index = 0;

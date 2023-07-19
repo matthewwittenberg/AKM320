@@ -19,6 +19,7 @@ void usbd_midi20_pitch_wheel(uint8_t channel, int32_t pitch);
 void usbd_midi20_modulation_wheel(uint8_t channel, uint16_t modulation);
 void usbd_midi20_volume(uint8_t channel, uint16_t volume);
 void usbd_midi20_sense();
+void usbd_midi20_sustain(uint8_t channel, bool on);
 void usbd_midi20_task();
 
 #endif

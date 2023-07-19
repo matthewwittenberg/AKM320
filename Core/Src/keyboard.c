@@ -9,6 +9,8 @@
 #define KEYBOARD_PORT GPIOB
 #define KEYBOARD_TIMER TIM1
 #define KEYBOARD_DELAY_LOOP_COUNT 20
+// comment out to use note on with velocity zero instead of a note off message
+//#define KEYBOARD_USE_NOTE_OFF
 
 typedef enum
 {
@@ -104,7 +106,11 @@ void keyboard_note_on(uint32_t note, uint32_t velocity)
  */
 void keyboard_note_off(uint32_t note)
 {
+#ifdef KEYBOARD_USE_NOTE_OFF
     MIDI_DEVICE.note_off(note + _keyboard_start_note, KEYBOARD_CHANNEL, 0);
+#else
+    MIDI_DEVICE.note_on(note + _keyboard_start_note, KEYBOARD_CHANNEL, 0);
+#endif
 }
 
 /**
@@ -206,7 +212,7 @@ static inline void keyboard_scan_key(uint16_t press_pin_mask, uint16_t detect_pi
 			// if we are currently pressed, send the note off
 			if(_key_status[key_index].status == KEYBOARD_KEY_PRESS)
 			{
-			    keyboard_note_off(key_index);
+                keyboard_note_off(key_index);
 			}
 
 			_key_status[key_index].status = KEYBOARD_KEY_RELEASE;

@@ -54,7 +54,7 @@ This project supports two different builds (sorry, not dynamically switchable), 
 4. DO NOT run the application builder as I modified drivers and startup code, they will be overwritten.
 5. Commenting is seriously lacking but will be added as I have time.
 ## Code
-1. The meat of the code is in Core/Source.
+1. The meat of the code is in Core/Src.
 2. main_app.c owns the main task, it processes keypad presses, ADC changes and proceses MIDI traffic.
 3. keyboard.c owns the keyboard task, it scans and processes key presses.
 4. usbd_midi_X0_app.c builds and processes MIDI USB messages depending on the version. 
@@ -62,54 +62,54 @@ This project supports two different builds (sorry, not dynamically switchable), 
 ## Peripheral Map
 To the best of my knowledge, here is the map of microcontroller pins
 
-| pin | pin name | function |
-| --- | --- | --- |
-|1|VBAT| |
-|2|PC13|button octave plus|
-|3|PC14|button octave minus|
-|4|PC15|button transpose plus|
-|5|OSC_IN|8MHz crystal|
-|6|OSC_OUT|8MHz crystal|
-|7|NRST|RESET|
-|8|VSSA|GND|
-|9|VDDA|3.3VA|
-|10|PA0| |
-|11|PA1| |
-|12|PA2| |
-|13|PA3| |
-|14|PA4|LED 1|
-|15|PA5|LED 2|
-|16|PA6|LED 3|
-|17|PA7|LED 4|
-|18|PB0|keyboard group 1|
-|19|PB1|keyboard group 2|
-|20|PB2|keyboard group 3|
-|21|PB10|keyboard key 2 down|
-|22|PB11|keyboard key 2 detect|
-|23|VSS1|GND|
-|24|VDD1|3.3V|
-|25|PB12|keyboard key 3 down|
-|26|PB13|keyboard key 3 detect|
-|27|PB14|keyboard key 4 down|
-|28|PB15|keyboard key 4 detect|
-|29|PA8|USB signal|
-|30|PA9| |
-|31|PA10| |
-|32|PA11|USBD-|
-|33|PA12|USBD+|
-|34|PA13|SWDIO|
-|35|VSS2|GND|
-|36|VDD2|3.3V|
-|37|JTCK/PA14|SWCLK|
-|38|JTDI/PA15|button transpose minus|
-|39|JTDO/PB3|keyboard group 4|
-|40|JNTRST/PB4|keyboard group 5|
-|41|PB5|keyboard group 6|
-|42|PB6|keyboard group 7|
-|43|PB7|keyboard group 8|
-|44|BOOT0| |
-|45|PB8|keyboard key 1 down|
-|46|PB9|keyboard key 1 detect|
-|47|VSS3|GND|
-|48|VDD3|3.3V|
+| pin | pin name | function               |
+| --- | --- |------------------------|
+|1|VBAT|                        |
+|2|PC13| button octave plus     |
+|3|PC14| button octave minus    |
+|4|PC15| button transpose plus  |
+|5|OSC_IN| 8MHz crystal           |
+|6|OSC_OUT| 8MHz crystal           |
+|7|NRST| RESET                  |
+|8|VSSA| GND                    |
+|9|VDDA| 3.3VA                  |
+|10|PA0|                        |
+|11|PA1|                        |
+|12|PA2|                        |
+|13|PA3| sustain pedal          |
+|14|PA4| LED 1                  |
+|15|PA5| LED 2                  |
+|16|PA6| LED 3                  |
+|17|PA7| LED 4                  |
+|18|PB0| keyboard group 1       |
+|19|PB1| keyboard group 2       |
+|20|PB2| keyboard group 3       |
+|21|PB10| keyboard key 2 down    |
+|22|PB11| keyboard key 2 detect  |
+|23|VSS1| GND                    |
+|24|VDD1| 3.3V                   |
+|25|PB12| keyboard key 3 down    |
+|26|PB13| keyboard key 3 detect  |
+|27|PB14| keyboard key 4 down    |
+|28|PB15| keyboard key 4 detect  |
+|29|PA8| USB signal             |
+|30|PA9|                        |
+|31|PA10|                        |
+|32|PA11| USBD-                  |
+|33|PA12| USBD+                  |
+|34|PA13| SWDIO                  |
+|35|VSS2| GND                    |
+|36|VDD2| 3.3V                   |
+|37|JTCK/PA14| SWCLK                  |
+|38|JTDI/PA15| button transpose minus |
+|39|JTDO/PB3| keyboard group 4       |
+|40|JNTRST/PB4| keyboard group 5       |
+|41|PB5| keyboard group 6       |
+|42|PB6| keyboard group 7       |
+|43|PB7| keyboard group 8       |
+|44|BOOT0|                        |
+|45|PB8| keyboard key 1 down    |
+|46|PB9| keyboard key 1 detect  |
+|47|VSS3| GND                    |
+|48|VDD3| 3.3V                   |
 

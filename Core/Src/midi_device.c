@@ -28,6 +28,7 @@ void midi_device_init(USBD_HandleTypeDef *pdev)
     MIDI_DEVICE.modulation_wheel = usbd_midi10_modulation_wheel;
     MIDI_DEVICE.volume = usbd_midi10_volume;
     MIDI_DEVICE.sense = usbd_midi10_sense;
+    MIDI_DEVICE.sustain = usbd_midi10_sustain;
     MIDI_DEVICE.task = usbd_midi10_task;
     MIDI_DEVICE.version = MIDI_VERSION_1_0;
 #else
@@ -47,6 +48,7 @@ void midi_device_init(USBD_HandleTypeDef *pdev)
     MIDI_DEVICE.modulation_wheel = usbd_midi20_modulation_wheel;
     MIDI_DEVICE.volume = usbd_midi20_volume;
     MIDI_DEVICE.sense = usbd_midi20_sense;
+    MIDI_DEVICE.sustain = usbd_midi20_sustain;
     MIDI_DEVICE.task = usbd_midi20_task;
     MIDI_DEVICE.version = MIDI_VERSION_2_0;
 #endif

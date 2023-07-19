@@ -112,6 +112,13 @@ void usbd_midi10_sense()
     usbd_midi10_send_message(message);
 }
 
+void usbd_midi10_sustain(uint8_t channel, bool on)
+{
+    uint32_t hold_value = on ? 0x7F : 0;
+    uint32_t message = CIN_CONTROL_CHANGE | ((MIDI_CONTROLLER << 8) | channel) | (MIDI_CONT_HOLD_PEDAL << 16) | (hold_value << 24);
+    usbd_midi10_send_message(message);
+}
+
 void usbd_midi10_task()
 {
 }

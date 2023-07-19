@@ -7,6 +7,7 @@
 #include "led.h"
 #include "adc.h"
 #include "midi_device.h"
+#include "sustain.h"
 #include <stdbool.h>
 
 #define ADC_POLL_RATE 20
@@ -92,6 +93,7 @@ void main_app_task(void const * argument)
     int16_t modulation;
     int16_t modulation_last = -1000;
     bool last_pitch_normal = true;
+    bool last_sustain = false;
 
     // start usb
     MX_USB_DEVICE_Init();
@@ -226,6 +228,13 @@ void main_app_task(void const * argument)
             MIDI_DEVICE.sense();
 
             sense_tick = osKernelSysTick();
+        }
+
+        // monitor sustain pedal
+        if(last_sustain != sustain_get())
+        {
+            last_sustain = sustain_get();
+            MIDI_DEVICE.sustain(KEYBOARD_CHANNEL, last_sustain);
         }
 
         // process USB MIDI

@@ -28,6 +28,7 @@
 #include "keyboard.h"
 #include "main_app.h"
 #include "adc.h"
+#include "sustain.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -98,6 +99,7 @@ int main(void)
   keypad_init();
   keyboard_init();
   adc_init();
+  sustain_init();
   main_app_init();
 
   /* USER CODE END 2 */

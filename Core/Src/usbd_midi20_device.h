@@ -9,6 +9,7 @@
 #define SRC_USBD_MIDI20_DEVICE_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "usbd_ioreq.h"
 
 #define MIDI20_MESSAGE_LENGTH 16

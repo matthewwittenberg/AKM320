@@ -20,6 +20,7 @@ typedef struct
     void (*modulation_wheel)(uint8_t channel, uint16_t modulation);
     void (*volume)(uint8_t channel, uint16_t volume);
     void (*sense)();
+    void (*sustain)(uint8_t channel, bool on);
     void (*task)();
     MIDI_VERSION_T version;
 } USBD_MIDI_DEVICE_T;

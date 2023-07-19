@@ -2,6 +2,7 @@
 #define SRC_USBD_MIDI10_DEVICE_H_
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "usbd_ioreq.h"
 
 #define RX_BUFFER_SIZE 16
