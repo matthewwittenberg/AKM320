@@ -73,9 +73,9 @@ To the best of my knowledge, here is the map of microcontroller pins
 |7|NRST| RESET                  |
 |8|VSSA| GND                    |
 |9|VDDA| 3.3VA                  |
-|10|PA0|                        |
-|11|PA1|                        |
-|12|PA2|                        |
+|10|PA0| modulation adc         |
+|11|PA1| pitch adc              |
+|12|PA2| volume adc             |
 |13|PA3| sustain pedal          |
 |14|PA4| LED 1                  |
 |15|PA5| LED 2                  |
