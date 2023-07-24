@@ -3,8 +3,8 @@
 #include "midi_spec.h"
 #include <stdbool.h>
 
-#define USBD_MIDI20_EP_OUT_ADDR 0x01
-#define USBD_MIDI20_EP_IN_ADDR 0x82
+#define USBD_MIDI20_EP_OUT_ADDR 0x02
+#define USBD_MIDI20_EP_IN_ADDR 0x81
 #define USBD_MIDI20_EP_MAX_PACKET_SIZE 0x40
 
 static uint8_t  USBD_MIDI20_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx);

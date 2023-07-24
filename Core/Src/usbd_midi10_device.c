@@ -1,8 +1,8 @@
 #include "usbd_midi10_device.h"
 #include "usbd_ctlreq.h"
 
-#define USBD_MIDI10_EP_OUT_ADDR 0x01
-#define USBD_MIDI10_EP_IN_ADDR 0x82
+#define USBD_MIDI10_EP_OUT_ADDR 0x02
+#define USBD_MIDI10_EP_IN_ADDR 0x81
 #define USBD_MIDI10_EP_MAX_PACKET_SIZE 0x20
 
 static uint8_t  USBD_MIDI10_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
