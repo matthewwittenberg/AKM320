@@ -250,6 +250,6 @@ void main_app_init()
 {
     keypad_register_callback(key_callback_handler, NULL);
 
-    osThreadDef(defaultTask, main_app_task, osPriorityNormal, 0, 256);
+    osThreadDef(defaultTask, main_app_task, osPriorityNormal, 0, 512);
     _main_app_thread_handle = osThreadCreate(osThread(defaultTask), NULL);
 }

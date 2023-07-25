@@ -3,8 +3,10 @@
 #include "midi_spec.h"
 #include <stdbool.h>
 
-#define USBD_MIDI20_EP_OUT_ADDR 0x02
+// for some reason, having the ep in and out on different numbers (like 0x81 and 0x02)
+// causes issues with data corruption, too lazy to figure out why as this works just fine...
 #define USBD_MIDI20_EP_IN_ADDR 0x81
+#define USBD_MIDI20_EP_OUT_ADDR 0x01
 #define USBD_MIDI20_EP_MAX_PACKET_SIZE 0x40
 
 static uint8_t  USBD_MIDI20_Init(USBD_HandleTypeDef *pdev, uint8_t cfgidx);
@@ -93,22 +95,6 @@ __ALIGN_BEGIN static uint8_t USBD_MIDI20_FS_CONFIG_DESC[USBD_MIDI20_CONFIG_DESC_
     24,                                 /* wTotalLength */
     0x00,
 
-    /* OUT ENDPOINT */
-    0x07,                               /* bLength */
-    USB_DESC_TYPE_ENDPOINT,             /* bDescriptorType */
-    USBD_MIDI20_EP_OUT_ADDR,            /* bEndpointAddress */
-    0x02,                               /* bmAttributes */
-    USBD_MIDI20_EP_MAX_PACKET_SIZE,     /* wMaxPacketSize */
-    0x00,
-    0x00,                               /* bInterval */
-
-    /* OUT ENDPOINT MS */
-    0x05,                               /* bLength */
-    0x25,                               /* bDescriptorType */
-    0x02,                               /* bDescriptorSubtype */
-    0x01,                               /* bNumGrpTrmBlock */
-    0x01,                               /* baAssoGrpTrmBlkID */
-
     /* IN ENDPOINT */
     0x07,                               /* bLength */
     USB_DESC_TYPE_ENDPOINT,             /* bDescriptorType */
@@ -119,6 +105,22 @@ __ALIGN_BEGIN static uint8_t USBD_MIDI20_FS_CONFIG_DESC[USBD_MIDI20_CONFIG_DESC_
     0x00,                               /* bInterval */
 
     /* IN ENDPOINT MS */
+    0x05,                               /* bLength */
+    0x25,                               /* bDescriptorType */
+    0x02,                               /* bDescriptorSubtype */
+    0x01,                               /* bNumGrpTrmBlock */
+    0x01,                               /* baAssoGrpTrmBlkID */
+
+    /* OUT ENDPOINT */
+    0x07,                               /* bLength */
+    USB_DESC_TYPE_ENDPOINT,             /* bDescriptorType */
+    USBD_MIDI20_EP_OUT_ADDR,            /* bEndpointAddress */
+    0x02,                               /* bmAttributes */
+    USBD_MIDI20_EP_MAX_PACKET_SIZE,     /* wMaxPacketSize */
+    0x00,
+    0x00,                               /* bInterval */
+
+    /* OUT ENDPOINT MS */
     0x05,                               /* bLength */
     0x25,                               /* bDescriptorType */
     0x02,                               /* bDescriptorSubtype */
