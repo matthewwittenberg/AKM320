@@ -31,6 +31,7 @@ This project supports two different builds (sorry, not dynamically switchable), 
 4. The AKM320 is bus powered, when ready, plug it into a USB port.
 
 ![pins](https://github.com/matthewwittenberg/AKM320/blob/main/images/pins.jpeg?raw=true)
+![pins](https://github.com/matthewwittenberg/AKM320/blob/main/images/system.jpeg?raw=true)
 ## Building
 1. The AKM320 is built on an [STM32F103C8](https://www.st.com/en/microcontrollers-microprocessors/stm32f103c8.html) microcontroller. Other than being slightly cramped from a code space standpoint, it is a workhorse.
 2. **The folks at MIDIPLUS protected the code flash so there is no readout capability to ever restore what was originally programmed.**
