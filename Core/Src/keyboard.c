@@ -12,6 +12,25 @@
 // comment out to use note on with velocity zero instead of a note off message
 //#define KEYBOARD_USE_NOTE_OFF
 
+// built table in excel with formula: =EXP(A1*0.03815)
+// response is decent compared to linear
+uint8_t VELOCITY_LOOKUP_TABLE[127] =
+{
+    1,  1,  1,  1,  1,  1,  1,  1,  1,  1,
+    1,  1,  1,  1,  1,  1,  1,  1,  2,  2,
+    2,  2,  2,  2,  2,  2,  2,  2,  3,  3,
+    3,  3,  3,  3,  3,  3,  4,  4,  4,  4,
+    4,  4,  5,  5,  5,  5,  6,  6,  6,  6,
+    6,  7,  7,  7,  8,  8,  8,  9,  9,  9,
+    10, 10, 11, 11, 11, 12, 12, 13, 13, 14,
+    15, 15, 16, 16, 17, 18, 18, 19, 20, 21,
+    21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+    32, 33, 34, 36, 37, 38, 40, 42, 43, 45,
+    47, 48, 50, 52, 54, 57, 59, 61, 63, 66,
+    69, 71, 74, 77, 80, 83, 86, 90, 93, 97,
+    101,105,109,113,117,122,127,
+};
+
 typedef enum
 {
 	KEYBOARD_KEY_RELEASE,
@@ -68,7 +87,7 @@ void keyboard_setup_timer()
 
 /**
  * @brief Notify MIDI of a note on message
- * NOTE: this is linear for now, should consider a better response curve
+ * NOTE: this is linear for now for MIDI 2.0
  *
  * @param note
  * @param velocity
@@ -89,6 +108,7 @@ void keyboard_note_on(uint32_t note, uint32_t velocity)
     {
         // convert to 0-127 range (7 bit)
         velocity_adjusted = 0x7F & (0x7F - (velocity/78));
+        velocity_adjusted = VELOCITY_LOOKUP_TABLE[velocity_adjusted];
     }
     else
     {

@@ -62,13 +62,13 @@ void usbd_midi10_init()
 
 void usbd_midi10_note_on(uint8_t note, uint8_t channel, uint16_t velocity)
 {
-    uint32_t message = CIN_NOTE_ON | ((MIDI_NOTE_ON << 8) | channel) | (note << 16) | (velocity << 24);
+    uint32_t message = CIN_NOTE_ON | ((MIDI_NOTE_ON | channel) << 8) | (note << 16) | (velocity << 24);
     usbd_midi10_send_message(message);
 }
 
 void usbd_midi10_note_off(uint8_t note, uint8_t channel, uint16_t velocity)
 {
-    uint32_t message = CIN_NOTE_OFF | ((MIDI_NOTE_OFF << 8) | channel) | (note << 16);
+    uint32_t message = CIN_NOTE_OFF | ((MIDI_NOTE_OFF | channel) << 8) | (note << 16);
     usbd_midi10_send_message(message);
 }
 
@@ -76,7 +76,7 @@ void usbd_midi10_pitch_wheel(uint8_t channel, int32_t pitch)
 {
     pitch = (pitch + 8192) & 0x3FFF;
     uint32_t pitch_new = (pitch & 0x7F) | ((pitch << 1) & 0x7F00);
-    uint32_t message = CIN_PITCH_BEND | ((MIDI_PITCH_WHEEL << 8) | channel) | (pitch_new << 16);
+    uint32_t message = CIN_PITCH_BEND | ((MIDI_PITCH_WHEEL | channel) << 8) | (pitch_new << 16);
     usbd_midi10_send_message(message);
 }
 
@@ -85,11 +85,11 @@ void usbd_midi10_modulation_wheel(uint8_t channel, uint16_t modulation)
     modulation = modulation & 0x3FFF;
 
     uint32_t fine = modulation & 0x7F;
-    uint32_t message = CIN_CONTROL_CHANGE | ((MIDI_CONTROLLER << 8) | channel) | (MIDI_CONT_MOD_WHEEL_FINE << 16) | (fine << 24);
+    uint32_t message = CIN_CONTROL_CHANGE | ((MIDI_CONTROLLER | channel) << 8) | (MIDI_CONT_MOD_WHEEL_FINE << 16) | (fine << 24);
     usbd_midi10_send_message(message);
 
     uint32_t course = (modulation >> 7) & 0x7F;
-    message = CIN_CONTROL_CHANGE | ((MIDI_CONTROLLER << 8) | channel) | (MIDI_CONT_MOD_WHEEL_COARSE << 16) | (course << 24);
+    message = CIN_CONTROL_CHANGE | ((MIDI_CONTROLLER | channel) << 8) | (MIDI_CONT_MOD_WHEEL_COARSE << 16) | (course << 24);
     usbd_midi10_send_message(message);
 }
 
@@ -98,11 +98,11 @@ void usbd_midi10_volume(uint8_t channel, uint16_t volume)
     volume = volume & 0x3FFF;
 
     uint32_t fine = volume & 0x7F;
-    uint32_t message = CIN_CONTROL_CHANGE | ((MIDI_CONTROLLER << 8) | channel) | (MIDI_CONT_VOLUME_FINE << 16) | (fine << 24);
+    uint32_t message = CIN_CONTROL_CHANGE | ((MIDI_CONTROLLER | channel) << 8) | (MIDI_CONT_VOLUME_FINE << 16) | (fine << 24);
     usbd_midi10_send_message(message);
 
     uint32_t course = (volume >> 7) & 0x7F;
-    message = CIN_CONTROL_CHANGE | ((MIDI_CONTROLLER << 8) | channel) | (MIDI_CONT_VOLUME_COARSE << 16) | (course << 24);
+    message = CIN_CONTROL_CHANGE | ((MIDI_CONTROLLER | channel) << 8) | (MIDI_CONT_VOLUME_COARSE << 16) | (course << 24);
     usbd_midi10_send_message(message);
 }
 
@@ -115,7 +115,7 @@ void usbd_midi10_sense()
 void usbd_midi10_sustain(uint8_t channel, bool on)
 {
     uint32_t hold_value = on ? 0x7F : 0;
-    uint32_t message = CIN_CONTROL_CHANGE | ((MIDI_CONTROLLER << 8) | channel) | (MIDI_CONT_HOLD_PEDAL << 16) | (hold_value << 24);
+    uint32_t message = CIN_CONTROL_CHANGE | ((MIDI_CONTROLLER | channel) << 8) | (MIDI_CONT_HOLD_PEDAL << 16) | (hold_value << 24);
     usbd_midi10_send_message(message);
 }
 
