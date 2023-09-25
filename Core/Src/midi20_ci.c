@@ -3,9 +3,13 @@
 #include <string.h>
 #include "midi_spec.h"
 
-#define MAN_ID_HI 0x00
-#define MAN_ID_MD 0x21
-#define MAN_ID_LO 0x4E
+extern const uint8_t MAN_ID_HI;
+extern const uint8_t MAN_ID_MD;
+extern const uint8_t MAN_ID_LO;
+extern const char* PRODUCT_NAME;
+extern const uint16_t PRODUCT_FAMILY;
+extern const uint16_t PRODUCT_MODEL;
+extern const uint32_t PRODUCT_SOFTWARE_VERSION;
 
 #define CI_MAX_SYSEX_SIZE 128
 
@@ -219,9 +223,9 @@ void midi20_ci_process_discovery1(uint8_t *pmessage, uint32_t length)
     reply.manufacturer[0] = MAN_ID_LO;
     reply.manufacturer[1] = MAN_ID_MD;
     reply.manufacturer[2] = MAN_ID_HI;
-    uint16_to_bytes(0, reply.family);
-    uint16_to_bytes(0, reply.family_model);
-    uint32_to_bytes(0, reply.software_revision);
+    uint16_to_bytes(PRODUCT_FAMILY, reply.family);
+    uint16_to_bytes(PRODUCT_MODEL, reply.family_model);
+    uint32_to_bytes(PRODUCT_SOFTWARE_VERSION, reply.software_revision);
     reply.capability_category = MIDI20_CI_CATEGORY_PROPERTY_EXCHANGE;
     uint32_to_bytes(CI_MAX_SYSEX_SIZE, reply.max_sysex_size);
     reply.sysex_end = MIDI_SYSEX_END;
@@ -240,9 +244,9 @@ void midi20_ci_process_discovery2(uint8_t *pmessage, uint32_t length)
     reply.manufacturer[0] = MAN_ID_LO;
     reply.manufacturer[1] = MAN_ID_MD;
     reply.manufacturer[2] = MAN_ID_HI;
-    uint16_to_bytes(0, reply.family);
-    uint16_to_bytes(0, reply.family_model);
-    uint32_to_bytes(0, reply.software_revision);
+    uint16_to_bytes(PRODUCT_FAMILY, reply.family);
+    uint16_to_bytes(PRODUCT_MODEL, reply.family_model);
+    uint32_to_bytes(PRODUCT_SOFTWARE_VERSION, reply.software_revision);
     reply.capability_category = MIDI20_CI_CATEGORY_PROPERTY_EXCHANGE;
     uint32_to_bytes(CI_MAX_SYSEX_SIZE, reply.max_sysex_size);
     reply.output_path_id = prequest->output_path_id;
@@ -262,7 +266,7 @@ void midi20_ci_process_inquiry_endpoint(uint8_t *pmessage, uint32_t length)
     midi20_ci_build_header(&prequest->header, &reply.header, MIDI20_UNIVERSAL_SYSEX_SUBID2_INQUIRY_ENDPOINT_REPLY);
     reply.status = 0;
     uint16_to_bytes(16, reply.length);
-    strcpy(reply.product_id, "AKM320_CUSTOM");
+    strcpy(reply.product_id, PRODUCT_NAME);
     reply.sysex_end = MIDI_SYSEX_END;
 
     if(_process_callback)

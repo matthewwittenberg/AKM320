@@ -4,6 +4,14 @@
 #include "midi_spec.h"
 #include "midi20_ci.h"
 
+const uint8_t MAN_ID_HI = 0x00;
+const uint8_t MAN_ID_MD = 0x21;
+const uint8_t MAN_ID_LO = 0x4E;
+const char* PRODUCT_NAME = "MIDIPLUS AKM320";
+const uint16_t PRODUCT_FAMILY = 0;
+const uint16_t PRODUCT_MODEL = 0;
+const uint32_t PRODUCT_SOFTWARE_VERSION = 1;
+
 MIDI20_CI_RESULT_T midi20_ci_get_prop_manufacturer(
     const char *pheader_data, uint16_t header_data_length,
     char *pproperty_data, uint16_t *pproperty_data_length,
