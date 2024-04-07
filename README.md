@@ -1,5 +1,5 @@
 # AKM320
-MIDIPLUS AKM320 - MIDI 2.0 Research Project
+MIDIPLUS AKM320 - MIDI 2.0 Research Project (THIS PROJECT HAS BEEN ABANDONED, MIDI 2.0 SUPPORT IS NOT FUNCTIONAL)
 ## About
 This is a simple project to learn (or attempt to) about MIDI 2.0. Goal was to learn on an actual product and not on some development board that is useless to me at the end. I chose the AKM320 as it is cheap and well designed. This code was pounded out fairly quickly on nights/weekends, I wouldn't consider it ready for prime-time.
 
